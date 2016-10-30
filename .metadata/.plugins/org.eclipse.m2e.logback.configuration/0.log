@@ -458,3 +458,31 @@
 2016-10-31 02:33:53,938 [Worker-72] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/main/resources
 2016-10-31 02:33:53,939 [Worker-72] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
 2016-10-31 02:33:53,940 [Worker-72] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/test/resources
+2016-10-31 02:39:24,411 [Worker-77] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:39:24,414 [Worker-77] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/main/resources
+2016-10-31 02:39:24,420 [Worker-77] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:39:24,425 [Worker-77] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/test/resources
+2016-10-31 02:39:39,703 [Worker-77] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:39:39,704 [Worker-77] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/main/resources
+2016-10-31 02:39:39,705 [Worker-77] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:39:39,715 [Worker-77] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/test/resources
+2016-10-31 02:39:41,812 [Worker-78] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:39:41,813 [Worker-78] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/main/resources
+2016-10-31 02:39:41,815 [Worker-78] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:39:41,816 [Worker-78] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/test/resources
+2016-10-31 02:40:08,434 [Worker-75] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:40:08,435 [Worker-75] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/main/resources
+2016-10-31 02:40:08,437 [Worker-75] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:40:08,437 [Worker-75] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/test/resources
+2016-10-31 02:47:56,042 [Worker-80] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:47:56,043 [Worker-80] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/main/resources
+2016-10-31 02:47:56,044 [Worker-80] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:47:56,044 [Worker-80] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/test/resources
+2016-10-31 02:50:08,539 [Worker-79] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:50:08,541 [Worker-79] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/main/resources
+2016-10-31 02:50:08,542 [Worker-79] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:50:08,543 [Worker-79] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/test/resources
+2016-10-31 02:50:58,312 [Worker-79] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:50:58,313 [Worker-79] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/main/resources
+2016-10-31 02:50:58,314 [Worker-79] WARN  o.e.m.c.i.embedder.EclipseLogger - Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+2016-10-31 02:50:58,315 [Worker-79] INFO  o.e.m.c.i.embedder.EclipseLogger - skip non existing resourceDirectory /Users/sherlyntoh/Desktop/MongoDB/master/mongodb/src/test/resources

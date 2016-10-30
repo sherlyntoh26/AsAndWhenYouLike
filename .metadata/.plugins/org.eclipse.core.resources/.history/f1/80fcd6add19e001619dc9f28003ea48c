@@ -1,0 +1,30 @@
+package mongodb;
+
+import org.bson.Document;
+
+import com.mongodb.client.MongoDatabase;
+
+public class OrderStatusTransaction {
+	private MongoDatabase database;
+
+	public OrderStatusTransaction(){
+		// public constructor
+	}
+	
+	public OrderStatusTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void getOrderStatus(int wID, int dID, int cID){
+		
+		// print customer
+		Document dcCustomerQuery = new Document("cWId", wID).append("cDId", dID).append("cId", cID);
+		Document dcCustomerProjection = new Document("cName",1).append("cBalance", 1);
+		Document dcCustomer = database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
+		System.out.println(String.format("Customer's Name: (%s, %s, %s) | Balance: %.2f", dcCustomer.getString("cName.first"), dcCustomer.getString("cName.middle"), dcCustomer.getString("cName.last"), dcCustomer.getDouble("cBalance")));
+
+		// get last order
+		Document dcOrderQuery = new Document("oWId", wID).append("oDId", dID).append("oCId", cID);
+		Document dcOrderProjection = new Document("oId",1).append("oEntryDate", 1).append("oCarrierId", 1).append("oOrderLine", 1);
+	}
+}

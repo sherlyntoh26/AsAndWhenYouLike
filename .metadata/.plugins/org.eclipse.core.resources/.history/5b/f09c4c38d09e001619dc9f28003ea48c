@@ -1,0 +1,15 @@
+package mongodb;
+
+import com.mongodb.client.MongoDatabase;
+
+public class OrderStatusTransaction {
+	private MongoDatabase database;
+
+	public OrderStatusTransaction(){
+		// public constructor
+	}
+	
+	public OrderStatusTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+}
