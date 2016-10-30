@@ -1,0 +1,48 @@
+package mongodb;
+
+import org.bson.Document;
+
+import com.mongodb.client.MongoDatabase;
+
+public class PaymentTransaction {
+	private MongoDatabase database;
+
+	public PaymentTransaction(){
+		// public constructor
+	}
+	
+	public PaymentTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void makePayment(int wID, int dID, int cID, double payment){
+		
+		// update warehouse
+		Document dcWarehouseQuery = new Document("wId", wID);
+		Document dcWarehouseProjection = new Document("wYtd", 1);
+		Document dcWarehouse = database.getCollection("warehouse").find(dcWarehouseQuery).projection(dcWarehouseProjection).first();
+		double wYtd = dcWarehouse.getDouble("wYtd");
+		Document dcWarehouseUpdate = new Document("wYtd", wYtd + payment);
+		database.getCollection("warehouse").replaceOne(dcWarehouseQuery, dcWarehouseUpdate);
+		
+		// update district
+		Document dcDistrictQuery = new Document("dWId", wID).append("dId", dID);
+		Document dcDistrictProjection = new Document("dTax", 1);
+		Document dcDistrict = database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection).first();
+		double dYtd = dcDistrict.getDouble("dTax");
+		Document dcDistrictUpdate = new Document("dYtd", dYtd + payment);
+		database.getCollection("district").replaceOne(dcDistrictQuery, dcDistrictUpdate);
+		
+		// update customer
+		Document dcCustomerQuery = new Document("cWId", wID).append("cDId", dID).append("cId", cID);
+		Document dcCustomerProjection = new Document("cName", 1).append("cAdd", 1).append("cPhone", 1).append("cSince", 1).append("cCredit", 1).append("cCreditLimit", 1).append("cDiscount", 1).append("cBalance", 1).append("cYtdPayment", 1).append("cPaymentCnt", 1);
+		
+		// output 
+				System.out.println("Customer Information:");
+				System.out.println(String.format("ID: (%d, %d, %d) | Name: (%s, %s, %s) | Address: (%s, %s, %s, %s, %s) | %s, %s, %s, %.2f, %.4f, %.2f", cWID, cDID, cID, customerRow.getString("c_first"), customerRow.getString("c_middle"), customerRow.getString("c_last"), customerRow.getString("c_street_1"), customerRow.getString("c_street_2"), customerRow.getString("c_city"), customerRow.getString("c_state"), customerRow.getString("c_zip"), customerRow.getString("c_phone"), customerRow.getTimestamp("c_since").toString(), customerRow.getString("c_credit"), customerRow.getDecimal("c_credit_lim").floatValue(), customerRow.getDecimal("c_discount").floatValue(), c_balance));
+				System.out.println(String.format("Warehouse Address: (%s, %s, %s, %s, %s)", wdRow.getString("wd_w_street_1"), wdRow.getString("wd_w_street_2"), wdRow.getString("wd_w_city"), wdRow.getString("wd_w_state"), wdRow.getString("wd_w_zip")));
+				System.out.println(String.format("District Address: (%s, %s, %s, %s, %s)", wdRow.getString("wd_d_street_1"), wdRow.getString("wd_d_street_2"), wdRow.getString("wd_d_city"), wdRow.getString("wd_d_state"), wdRow.getString("wd_d_zip")));
+				System.out.println(String.format("Payment Amount: %.2f", payment));
+	}
+	
+}

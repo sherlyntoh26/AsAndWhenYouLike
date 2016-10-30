@@ -23,8 +23,12 @@ public class NewOrderTransaction {
 			int[] quantities) {
 		
 		// get d_next_o_id from given wid, did
-		Document dcDistrictQuery = new Document("dWId", wID).append("dId", dID);
-		Document dcDistrictProjection = new Document("dNextOId", 1).append("dTax", 1);
+		Document dcDistrictQuery = new Document();
+		dcDistrictQuery.put("dWId", wID);
+		dcDistrictQuery.put("dId", dID);
+		Document dcDistrictProjection = new Document();
+		dcDistrictProjection.put("dNextOId", 1);
+		dcDistrictProjection.put("dTax", 1);
 		Document dcDistrict = database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection).first();
 		int dNextOId = dcDistrict.getInteger("dNextOId");
 		double dTax = dcDistrict.getDouble("dTax");
@@ -38,12 +42,21 @@ public class NewOrderTransaction {
 		int allLocal = 1;
 		double totalAmt = 0.0;
 		ArrayList<String> arrayListOutput = new ArrayList<String>();
+		
+		Document dcInvProjection = new Document();
+		dcInvProjection.put("iQty", 1);
+		dcInvProjection.put("iYtd", 1);
+		dcInvProjection.put("iOrderCnt", 1);
+		dcInvProjection.put("iRemoteCnt", 1);
+		dcInvProjection.put("iPrice", 1);
+		dcInvProjection.put("iName", 1);
+		
 		ArrayList<Map<String, Object>> orderLineArr = new ArrayList<Map<String, Object>>();
 		
-		Document dcInvProjection = new Document("iQty", 1).append("iYtd", 1).append("iOrderCnt", 1).append("iRemoteCnt", 1).append("iPrice", 1).append("iName", 1);
-		
 		for (int i=0; i<numOfItems; i++){
-			Document dcInvQuery = new Document("iWId", wID).append("iId", itemNumberArr[i]);
+			Document dcInvQuery = new Document();
+			dcInvQuery.put("iWId", wID);
+			dcInvQuery.put("iId", itemNumberArr[i]);
 			Document dcInv = database.getCollection("inventory").find(dcInvQuery).projection(dcInvProjection).first();
 			int invQty = dcInv.getInteger("iQty");
 			double invYtd = dcInv.getDouble("iYtd");
@@ -65,6 +78,10 @@ public class NewOrderTransaction {
 			
 			// update Inventory
 			Document dcInvUpdate = new Document("iQty", adjustedQty).append("iYtd", invYtd+quantities[i]).append("invOrderCnt", invOrderCnt+1).append("iRemoteCnt", invRemoteCnt);
+			//dcInvUpdate.put("iQty", adjustedQty);
+			//dcInvUpdate.put("iYtd", invYtd+quantities[i]);
+			//dcInvUpdate.put("invOrderCnt", invOrderCnt+1);
+			//dcInvUpdate.put("iRemoteCnt", invRemoteCnt);
 			database.getCollection("inventory").replaceOne(dcInvQuery, dcInvUpdate);
 			
 			// create document for 1 orderLine --> place it in array first
@@ -100,14 +117,22 @@ public class NewOrderTransaction {
 		database.getCollection("order").insertOne(new Document(orderMap));
 		
 		// get customer information
-		Document dcCustomerQuery = new Document("cWId", wID).append("cDId", dID).append("cId", cID);
-		Document dcCustomerProjection = new Document("cName.last", 1).append("credit", 1).append("cDiscount", 1);
+		Document dcCustomerQuery = new Document();
+		dcCustomerQuery.put("cWId", wID);
+		dcCustomerQuery.put("cDId", dID);
+		dcCustomerQuery.put("cId", cID);
+		Document dcCustomerProjection = new Document();
+		dcCustomerProjection.put("cName.last", 1);
+		dcCustomerProjection.put("credit", 1);
+		dcCustomerProjection.put("cDiscount", 1);
 		Document dcCustomer = database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
 		double cDiscount = dcCustomer.getDouble("cDiscount");
 		
 		// get warehouse information
-		Document dcWarehouseQuery = new Document("wId", wID);
-		Document dcWarehouseProjection = new Document("wTax", 1);
+		Document dcWarehouseQuery = new Document();
+		dcWarehouseQuery.put("wId", wID);
+		Document dcWarehouseProjection = new Document();
+		dcWarehouseProjection.put("wTax", 1);
 		Document dcWarehouse = database.getCollection("warehouse").find(dcWarehouseQuery).projection(dcWarehouseProjection).first();
 		double wTax = dcWarehouse.getDouble("wTax");
 		totalAmt = totalAmt * (1 + dTax + wTax) * (1 - cDiscount);
