@@ -1,0 +1,20 @@
+package mongodb;
+
+import com.mongodb.client.MongoDatabase;
+
+public class PaymentTransaction {
+	private MongoDatabase database;
+
+	public PaymentTransaction(){
+		// public constructor
+	}
+	
+	public PaymentTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void makePayment(int wID, int dID, int cID, float payment){
+		
+	}
+	
+}

@@ -1,0 +1,40 @@
+package mongodb;
+
+public class MainFile {
+	private String dbName;
+	private int dbNo;
+	private String ipAdd;
+	private int transactionFileNumber;
+
+	public static void main(String[] args) {
+		int dbNo;
+		String dbName;
+		int noOfNodes;
+		int transactionFileNumber;
+		if (args == null || args.length <= 0) {
+			dbNo = 8;
+			dbName = "d8";
+			noOfNodes = 1;
+			transactionFileNumber = 0;
+		} else {
+			boolean usingD8 = (args[0].trim()).equals("D8");
+			if(usingD8){
+				dbName = "d8";
+				dbNo = 8;
+			}else{
+				dbName = "d40";
+				dbNo = 40;
+			}
+			noOfNodes = Integer.parseInt(args[1]);
+			transactionFileNumber = Integer.parseInt(args[2]);
+		}
+		
+	}
+	
+	public MainFile(int dbNo, String dbName, String ipAdd, int transactionFileNumber){
+		this.dbNo = dbNo;
+		this.ipAdd = ipAdd;
+		this.dbName = dbName;
+		this.transactionFileNumber = transactionFileNumber;
+	}
+}

@@ -1,0 +1,31 @@
+package mongodb;
+
+import org.bson.Document;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoDatabase;
+
+public class NewOrderTransaction {
+	private MongoDatabase database;
+
+	public NewOrderTransaction(){
+		// public constructor
+	}
+	
+	public NewOrderTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void newOrder(int wID, int dID, int cID, int numOfItems, int[] itemNumberArr, int[] sWarehouseID,
+			int[] quantities) {
+		
+		// get d_next_o_id from given wid, did
+		Document dcDistrictQuery = new Document();
+		dcDistrictQuery.put("dWId", wID);
+		dcDistrictQuery.put("dId", dID);
+		Document dcDistrictProjection = new Document();
+		dcDistrictProjection.put("dNextOId", 1);
+		Document dcDistrict = database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection).first();
+		int dNextOId = dcDistrict.getInteger("dNextOId");
+		
+	}
+}

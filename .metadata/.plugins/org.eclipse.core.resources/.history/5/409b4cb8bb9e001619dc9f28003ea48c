@@ -1,0 +1,27 @@
+package mongodb;
+
+import org.bson.Document;
+
+import com.mongodb.client.MongoDatabase;
+
+public class NewOrderTransaction {
+	private MongoDatabase database;
+
+	public NewOrderTransaction(){
+		// public constructor
+	}
+	
+	public NewOrderTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void newOrder(int wID, int dID, int cID, int numOfItems, int[] itemNumberArr, int[] sWarehouseID,
+			int[] quantities) {
+		
+		// get d_next_o_id from given wid, did
+		Document dcDistrict = new Document();
+		dcDistrict.put("dWId", wID);
+		dcDistrict.put("dId", dID);
+		
+	}
+}

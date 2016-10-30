@@ -1,0 +1,86 @@
+package mongodb;
+
+import java.util.ArrayList;
+
+import org.bson.Document;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoDatabase;
+
+public class NewOrderTransaction {
+	private MongoDatabase database;
+
+	public NewOrderTransaction(){
+		// public constructor
+	}
+	
+	public NewOrderTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void newOrder(int wID, int dID, int cID, int numOfItems, int[] itemNumberArr, int[] sWarehouseID,
+			int[] quantities) {
+		
+		// get d_next_o_id from given wid, did
+		Document dcDistrictQuery = new Document();
+		dcDistrictQuery.put("dWId", wID);
+		dcDistrictQuery.put("dId", dID);
+		Document dcDistrictProjection = new Document();
+		dcDistrictProjection.put("dNextOId", 1);
+		Document dcDistrict = database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection).first();
+		int dNextOId = dcDistrict.getInteger("dNextOId");
+		
+		// update d_next_o_id by 1
+		Document dcDistrictUpdate = new Document();
+		dcDistrictUpdate.put("dNextOId", dNextOId+1);
+		database.getCollection("district").updateOne(dcDistrictQuery, dcDistrictUpdate);
+		
+		// create newOrder
+		int allLocal = 1;
+		double totalAmt = 0.0;
+		ArrayList<String> arrayListOutput = new ArrayList<String>();
+		
+		Document dcInvProjection = new Document();
+		dcInvProjection.put("iQty", 1);
+		dcInvProjection.put("iYtd", 1);
+		dcInvProjection.put("iOrderCnt", 1);
+		dcInvProjection.put("iRemoteCnt", 1);
+		dcInvProjection.put("iPrice", 1);
+		dcInvProjection.put("iName", 1);
+		
+		for (int i=0; i<numOfItems; i++){
+			Document dcInvQuery = new Document();
+			dcInvQuery.put("iWId", wID);
+			dcInvQuery.put("iId", itemNumberArr[i]);
+			Document dcInv = database.getCollection("inventory").find(dcInvQuery).projection(dcInvProjection).first();
+			int invQty = dcInv.getInteger("iQty");
+			double invYtd = dcInv.getDouble("iYtd");
+			int invOrderCnt = dcInv.getInteger("iOrderCnt");
+			int invRemoteCnt = dcInv.getInteger("iRemoteCnt");
+			double invPrice = dcInv.getDouble("iPrice");
+			String invName = dcInv.getString("iName");
+			double itemAmt = (quantities[i] * invPrice);
+			totalAmt += itemAmt;
+			
+			int adjustedQty = invQty - quantities[i];
+			if(adjustedQty < 10){
+				adjustedQty +=100;
+			}
+			if(sWarehouseID[i] != wID){
+				allLocal=0;
+				invRemoteCnt +=1;
+			}
+			
+			// update Inventory
+			Document dcInvUpdate = new Document();
+			dcInvUpdate.put("iQty", adjustedQty);
+			dcInvUpdate.put("iYtd", invYtd+quantities[i]);
+			dcInvUpdate.put("invOrderCnt", invOrderCnt+1);
+			dcInvUpdate.put("iRemoteCnt", invRemoteCnt);
+			database.getCollection("inventory").updateOne(dcInvQuery, dcInvUpdate);
+			
+			// prepare printing statement
+			arrayListOutput.add(String.format("Item: %d | %s, Warehouse %d. Quantity: %d. Amount: %.2f, Stock: %d",
+					itemNumberArr[i], invName, sWarehouseID[i], quantities[i], itemAmt, adjustedQty));
+		}
+	}
+}

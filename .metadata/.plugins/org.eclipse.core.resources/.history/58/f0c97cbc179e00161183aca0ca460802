@@ -1,0 +1,23 @@
+package mongodb;
+
+import java.util.Collection;
+
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
+
+public class Connection {
+	MongoClient mongo;
+
+	public Connection(){
+		mongo = new MongoClient("localhost", 27017);
+	}
+	
+	
+	public static void main(String[] args) {
+		Connection connection = new Connection();
+		Collection<DB> dbs = connection.mongo.getUsedDatabases();
+		for(DB db:dbs){
+			System.out.pritnln(db.getName());
+		}
+	}
+}

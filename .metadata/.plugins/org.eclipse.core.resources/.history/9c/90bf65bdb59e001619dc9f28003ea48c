@@ -1,0 +1,10 @@
+package mongodb;
+
+import java.util.ArrayList;
+
+public class MainFile {
+	
+
+	public static void main(String[] args) {
+	}
+}

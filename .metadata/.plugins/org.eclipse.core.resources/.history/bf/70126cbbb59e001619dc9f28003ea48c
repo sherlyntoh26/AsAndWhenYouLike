@@ -1,0 +1,84 @@
+package mongodb;
+
+import java.util.ArrayList;
+
+public class MainFile {
+	private String dbName;
+	private int noOfNodes;
+	private String ipAdd;
+	private int transactionFileNumber;
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		String dbName;
+		int noOfNodes;
+		int transactionFileNumber;
+		if(args==null||args.length <=0){
+			dbName = "d8";
+			noOfNodes = 1;
+			transactionFileNumber = 1;
+		}else{
+			boolean usingD8 = (args[0].trim().equals("D8"));
+			if(usingD8){
+				dbName = "d8";
+			}else{
+				dbName = "d40";
+			}
+			noOfNodes = Integer.parseInt(args[1]);
+			transactionFileNumber = Integer.parseInt(args[2]);
+		}
+
+		String[] arrayIpAdd = new String[3];
+		arrayIpAdd[0] = "192.168.48.249";
+		arrayIpAdd[1] = "192.168.48.250";
+		arrayIpAdd[2] = "192.168.48.251";
+		int noNum = 0;
+
+		ArrayList<Float> listThroughput = new ArrayList<Float>();
+		for (int i = 0; i < transactionFileNumber; i++) {
+
+			MainFile mf = new MainFile(dbName, noOfNodes, arrayIpAdd[noNum], i);
+			Thread tnew = new Thread(new Runnable(){
+				@Override
+				public void run(){
+					float currentThroughput = mf.runTransactions();
+					listThroughput.add(currentThroughput);
+				}
+			});
+			tnew.start();
+			noNum++;
+			if(noNum == noOfNodes){
+				noNum = 0;
+			}
+		}
+
+		float max = -1;
+		float min = 99999;
+		float average, total = 0;
+		for(int i=0; i<listThroughput.size(); i++){
+			if(listThroughput.get(i) > max){
+				max = listThroughput.get(i);
+			}
+
+			if(listThroughput.get(i) < min){
+				min = listThroughput.get(i);
+			}
+			total += listThroughput.get(i);
+		}
+		average = total/listThroughput.size();
+		System.out.println(String.format("Maximum Throughput: %.02f", max));
+		System.out.println(String.format("Minimum Throughput: %.02f", min));
+		System.out.println(String.format("Average Throughput: %.02f", average));
+	}
+	
+	public MainFile(String dbName, int noOfNodes, String ipAdd, int transactionFileNumber) {
+		this.ipAdd = ipAdd;
+		this.dbName = dbName;
+		this.noOfNodes = noOfNodes;
+		this.transactionFileNumber = transactionFileNumber;
+	}
+	
+	public float runTransactions(){
+		
+	}
+}

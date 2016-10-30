@@ -1,0 +1,137 @@
+package mongodb;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.bson.Document;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoDatabase;
+
+public class NewOrderTransaction {
+	private MongoDatabase database;
+
+	public NewOrderTransaction(){
+		// public constructor
+	}
+	
+	public NewOrderTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void newOrder(int wID, int dID, int cID, int numOfItems, int[] itemNumberArr, int[] sWarehouseID,
+			int[] quantities) {
+		
+		// get d_next_o_id from given wid, did
+		Document dcDistrictQuery = new Document();
+		dcDistrictQuery.put("dWId", wID);
+		dcDistrictQuery.put("dId", dID);
+		Document dcDistrictProjection = new Document();
+		dcDistrictProjection.put("dNextOId", 1);
+		Document dcDistrict = database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection).first();
+		int dNextOId = dcDistrict.getInteger("dNextOId");
+		
+		// update d_next_o_id by 1
+		Document dcDistrictUpdate = new Document();
+		dcDistrictUpdate.put("dNextOId", dNextOId+1);
+		database.getCollection("district").updateOne(dcDistrictQuery, dcDistrictUpdate);
+		
+		// create newOrder
+		int allLocal = 1;
+		double totalAmt = 0.0;
+		ArrayList<String> arrayListOutput = new ArrayList<String>();
+		
+		Document dcInvProjection = new Document();
+		dcInvProjection.put("iQty", 1);
+		dcInvProjection.put("iYtd", 1);
+		dcInvProjection.put("iOrderCnt", 1);
+		dcInvProjection.put("iRemoteCnt", 1);
+		dcInvProjection.put("iPrice", 1);
+		dcInvProjection.put("iName", 1);
+		
+		ArrayList<Map<String, Object>> orderLineArr = new ArrayList<Map<String, Object>>();
+		
+		for (int i=0; i<numOfItems; i++){
+			Document dcInvQuery = new Document();
+			dcInvQuery.put("iWId", wID);
+			dcInvQuery.put("iId", itemNumberArr[i]);
+			Document dcInv = database.getCollection("inventory").find(dcInvQuery).projection(dcInvProjection).first();
+			int invQty = dcInv.getInteger("iQty");
+			double invYtd = dcInv.getDouble("iYtd");
+			int invOrderCnt = dcInv.getInteger("iOrderCnt");
+			int invRemoteCnt = dcInv.getInteger("iRemoteCnt");
+			double invPrice = dcInv.getDouble("iPrice");
+			String invName = dcInv.getString("iName");
+			double itemAmt = (quantities[i] * invPrice);
+			totalAmt += itemAmt;
+			
+			int adjustedQty = invQty - quantities[i];
+			if(adjustedQty < 10){
+				adjustedQty +=100;
+			}
+			if(sWarehouseID[i] != wID){
+				allLocal=0;
+				invRemoteCnt +=1;
+			}
+			
+			// update Inventory
+			Document dcInvUpdate = new Document();
+			dcInvUpdate.put("iQty", adjustedQty);
+			dcInvUpdate.put("iYtd", invYtd+quantities[i]);
+			dcInvUpdate.put("invOrderCnt", invOrderCnt+1);
+			dcInvUpdate.put("iRemoteCnt", invRemoteCnt);
+			database.getCollection("inventory").updateOne(dcInvQuery, dcInvUpdate);
+			
+			// create document for 1 orderLine --> place it in array first
+			Map<String, Object> itemMap = new HashMap<String, Object>();
+			itemMap.put("num", i+1);
+			itemMap.put("iId", itemNumberArr[i]);
+			itemMap.put("amt", itemAmt);
+			itemMap.put("supplyWId", sWarehouseID[i]);
+			itemMap.put("qty", quantities[i]);
+			itemMap.put("distInfo", "S_DIST_" + dID);
+			itemMap.put("iName", invName);
+			orderLineArr.add(itemMap);
+			
+			// prepare printing statement
+			arrayListOutput.add(String.format("Item: %d | %s, Warehouse %d. Quantity: %d. Amount: %.2f, Stock: %d",
+					itemNumberArr[i], invName, sWarehouseID[i], quantities[i], itemAmt, adjustedQty));
+		}
+		
+		// insert into collection Order
+		Timestamp orderDate = new Timestamp(System.currentTimeMillis());
+		Map<String, Object> orderMap = new HashMap<String, Object>();
+		orderMap.put("oWId", wID);
+		orderMap.put("oDId", dID);
+		orderMap.put("oId", dNextOId);
+		orderMap.put("oCId", cID);
+		orderMap.put("oCarrierId", 1);
+		orderMap.put("oOlCnt", numOfItems);
+		orderMap.put("oAllLocal", allLocal);
+		orderMap.put("oEntryDate", orderDate);
+		orderMap.put("oDeliveryDate", null);
+		orderMap.put("oTotalAmt", totalAmt);
+		orderMap.put("oOrderLine", orderLineArr);
+		
+		// get customer information
+		Document dcCustomerQuery = new Document();
+		dcCustomerQuery.put("cWId", wID);
+		dcCustomerQuery.put("cDId", dID);
+		dcCustomerQuery.put("cId", cID);
+		Document dcCustomerProjection = new Document();
+		dcCustomerProjection.put("cName.last", 1);
+		dcCustomerProjection.put("credit", 1);
+		dcCustomerProjection.put("cDiscount", 1);
+		Document dcCustomer = database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
+		
+		System.out.println(String.format("Customer %s, %s, %.4f", dcCustomer.get("cName.last"), dcCustomer.get("cCredit"), cDiscount));
+		System.out.println(String.format("Warehouse Tax: %.4f, District tax: %.4f", wTax, dTax));
+		System.out.println(String.format("Order Number: %d, Entry Date: %s", nextOrderID, orderDate));
+		System.out.println(String.format("Number of Item: %d, Total amount: %.2f", numOfItems, totalAmt));
+
+		for (String str : arrayListOutput) {
+			System.out.println(str);
+		}
+	}
+}

@@ -1,0 +1,15 @@
+package mongodb;
+
+public class MainFile {
+	private String dbName;
+	private int noOfNodes;
+	private String ipAdd;
+	private int transactionFileNumber;
+
+	public static void main(String[] args) {
+	}
+	
+	public MainFile(int dbNo, String dbName, String ipAdd, int transactionFileNumber){
+		
+	}
+}

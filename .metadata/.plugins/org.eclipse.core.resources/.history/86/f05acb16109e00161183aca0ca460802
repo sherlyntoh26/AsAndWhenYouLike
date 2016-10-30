@@ -1,0 +1,12 @@
+package mongodb;
+
+import com.mongodb.Mongo;
+
+public class Connection {
+	MongoClient mongo;
+
+	public Connection(){
+		mongo = new MongoClient("localhost", 27017);
+	}
+	
+}
