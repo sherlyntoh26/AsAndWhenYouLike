@@ -113,10 +113,10 @@ public class NewOrderTransaction {
 		BasicDBObject dcWarehouseQuery = new BasicDBObject().append("wId", wID);
 		BasicDBObject dcWarehouseProjection = new BasicDBObject().append("wTax", 1);
 		DBObject dcWarehouse = (DBObject) database.getCollection("warehouse").find(dcWarehouseQuery).projection(dcWarehouseProjection).first();
-		double wTax = (Double) dcWarehouse.get("wTax");
+		double wTax = dcWarehouse.getDouble("wTax");
 		totalAmt = totalAmt * (1 + dTax + wTax) * (1 - cDiscount);
 		
-		System.out.println(String.format("Customer %s, %s, %.4f", dcCustomer.get("cName.last").toString(), dcCustomer.get("cCredit").toString(), cDiscount));
+		System.out.println(String.format("Customer %s, %s, %.4f", dcCustomer.get("cName.last"), dcCustomer.get("cCredit"), cDiscount));
 		System.out.println(String.format("Warehouse Tax: %.4f, District tax: %.4f", wTax, dTax));
 		System.out.println(String.format("Order Number: %d, Entry Date: %s", dNextOId, orderDate));
 		System.out.println(String.format("Number of Item: %d, Total amount: %.2f", numOfItems, totalAmt));

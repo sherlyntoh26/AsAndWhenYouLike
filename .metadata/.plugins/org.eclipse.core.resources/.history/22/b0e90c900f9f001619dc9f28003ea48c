@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bson.Document;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.MongoDatabase;
@@ -50,8 +48,8 @@ public class NewOrderTransaction {
 			BasicDBObject dcInvQuery = new BasicDBObject().append("iWId", wID).append("iId", itemNumberArr[i]);
 			DBObject dcInv = (DBObject) database.getCollection("inventory").find(dcInvQuery).projection(dcInvProjection).first();
 			int invQty = (Integer) dcInv.get("iQty");
-			//double invYtd = (Double) dcInv.get("iYtd");
-			//int invOrderCnt = (Integer) dcInv.get("iOrderCnt");
+			double invYtd = (Double) dcInv.get("iYtd");
+			int invOrderCnt = (Integer) dcInv.get("iOrderCnt");
 			int invRemoteCnt = (Integer) dcInv.get("iRemoteCnt");
 			double invPrice = (Double) dcInv.get("iPrice");
 			String invName = dcInv.get("iName").toString();
@@ -69,7 +67,7 @@ public class NewOrderTransaction {
 			
 			// update Inventory
 			BasicDBObject dcInvUpdate = new BasicDBObject().append("$set", new BasicDBObject("iQty", adjustedQty)).append("$inc", new BasicDBObject("iYtd", quantities[i])).append("$inc", new BasicDBObject("invOrderCnt", 1)).append("$set", new BasicDBObject("iRemoteCnt", invRemoteCnt));
-			database.getCollection("inventory").updateOne(dcInvQuery, dcInvUpdate);
+			database.getCollection("inventory").replaceOne(dcInvQuery, dcInvUpdate);
 			
 			// create document for 1 orderLine --> place it in array first
 			Map<String, Object> itemMap = new HashMap<String, Object>();
@@ -101,22 +99,22 @@ public class NewOrderTransaction {
 		orderMap.put("oDeliveryDate", null);
 		orderMap.put("oTotalAmt", totalAmt);
 		orderMap.put("oOrderLine", orderLineArr);
-		database.getCollection("order").insertOne((Document)orderMap);
+		database.getCollection("order").insertOne(new Document(orderMap));
 		
 		// get customer information
-		BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", wID).append("cDId", dID).append("cId", cID);
-		BasicDBObject dcCustomerProjection = new BasicDBObject().append("cName.last", 1).append("credit", 1).append("cDiscount", 1);
-		DBObject dcCustomer = (DBObject) database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
-		double cDiscount = (Double) dcCustomer.get("cDiscount");
+		Document dcCustomerQuery = new Document("cWId", wID).append("cDId", dID).append("cId", cID);
+		Document dcCustomerProjection = new Document("cName.last", 1).append("credit", 1).append("cDiscount", 1);
+		Document dcCustomer = database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
+		double cDiscount = dcCustomer.getDouble("cDiscount");
 		
 		// get warehouse information
-		BasicDBObject dcWarehouseQuery = new BasicDBObject().append("wId", wID);
-		BasicDBObject dcWarehouseProjection = new BasicDBObject().append("wTax", 1);
-		DBObject dcWarehouse = (DBObject) database.getCollection("warehouse").find(dcWarehouseQuery).projection(dcWarehouseProjection).first();
-		double wTax = (Double) dcWarehouse.get("wTax");
+		Document dcWarehouseQuery = new Document("wId", wID);
+		Document dcWarehouseProjection = new Document("wTax", 1);
+		Document dcWarehouse = database.getCollection("warehouse").find(dcWarehouseQuery).projection(dcWarehouseProjection).first();
+		double wTax = dcWarehouse.getDouble("wTax");
 		totalAmt = totalAmt * (1 + dTax + wTax) * (1 - cDiscount);
 		
-		System.out.println(String.format("Customer %s, %s, %.4f", dcCustomer.get("cName.last").toString(), dcCustomer.get("cCredit").toString(), cDiscount));
+		System.out.println(String.format("Customer %s, %s, %.4f", dcCustomer.get("cName.last"), dcCustomer.get("cCredit"), cDiscount));
 		System.out.println(String.format("Warehouse Tax: %.4f, District tax: %.4f", wTax, dTax));
 		System.out.println(String.format("Order Number: %d, Entry Date: %s", dNextOId, orderDate));
 		System.out.println(String.format("Number of Item: %d, Total amount: %.2f", numOfItems, totalAmt));

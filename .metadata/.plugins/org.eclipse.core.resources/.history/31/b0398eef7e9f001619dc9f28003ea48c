@@ -106,17 +106,17 @@ public class NewOrderTransaction {
 		// get customer information
 		BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", wID).append("cDId", dID).append("cId", cID);
 		BasicDBObject dcCustomerProjection = new BasicDBObject().append("cName.last", 1).append("credit", 1).append("cDiscount", 1);
-		DBObject dcCustomer = (DBObject) database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
-		double cDiscount = (Double) dcCustomer.get("cDiscount");
+		Document dcCustomer = database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
+		double cDiscount = dcCustomer.getDouble("cDiscount");
 		
 		// get warehouse information
-		BasicDBObject dcWarehouseQuery = new BasicDBObject().append("wId", wID);
-		BasicDBObject dcWarehouseProjection = new BasicDBObject().append("wTax", 1);
-		DBObject dcWarehouse = (DBObject) database.getCollection("warehouse").find(dcWarehouseQuery).projection(dcWarehouseProjection).first();
-		double wTax = (Double) dcWarehouse.get("wTax");
+		Document dcWarehouseQuery = new Document("wId", wID);
+		Document dcWarehouseProjection = new Document("wTax", 1);
+		Document dcWarehouse = database.getCollection("warehouse").find(dcWarehouseQuery).projection(dcWarehouseProjection).first();
+		double wTax = dcWarehouse.getDouble("wTax");
 		totalAmt = totalAmt * (1 + dTax + wTax) * (1 - cDiscount);
 		
-		System.out.println(String.format("Customer %s, %s, %.4f", dcCustomer.get("cName.last").toString(), dcCustomer.get("cCredit").toString(), cDiscount));
+		System.out.println(String.format("Customer %s, %s, %.4f", dcCustomer.get("cName.last"), dcCustomer.get("cCredit"), cDiscount));
 		System.out.println(String.format("Warehouse Tax: %.4f, District tax: %.4f", wTax, dTax));
 		System.out.println(String.format("Order Number: %d, Entry Date: %s", dNextOId, orderDate));
 		System.out.println(String.format("Number of Item: %d, Total amount: %.2f", numOfItems, totalAmt));

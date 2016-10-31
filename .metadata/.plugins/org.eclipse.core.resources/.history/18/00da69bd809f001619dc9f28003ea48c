@@ -1,0 +1,59 @@
+package mongodb;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.client.MongoDatabase;
+
+public class PaymentTransaction {
+	private MongoDatabase database;
+
+	public PaymentTransaction(){
+		// public constructor
+	}
+
+	public PaymentTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+
+	public void makePayment(int wID, int dID, int cID, double payment){
+
+		// update warehouse
+		BasicDBObject dcWarehouseQuery = new BasicDBObject().append("wId", wID);
+		//BasicDBObject dcWarehouseProjection = new BasicDBObject().append("wYtd", 1).append("wAdd", 1);
+		BasicDBObject dcWarehouseProjection = new BasicDBObject().append("wAdd", 1);
+		DBObject dcWarehouse = (DBObject) database.getCollection("warehouse").find(dcWarehouseQuery).projection(dcWarehouseProjection).first();
+		//double wYtd = (Double) dcWarehouse.get("wYtd");
+		BasicDBObject dcWarehouseUpdate = new BasicDBObject().append("$inc", new BasicDBObject("wYtd", payment));
+		database.getCollection("warehouse").updateOne(dcWarehouseQuery, dcWarehouseUpdate);
+
+		// update district
+		BasicDBObject dcDistrictQuery = new BasicDBObject().append("dWId", wID).append("dId", dID);
+		//BasicDBObject dcDistrictProjection = new BasicDBObject().append("dTax", 1).append("dAdd", 1);
+		BasicDBObject dcDistrictProjection = new BasicDBObject().append("dAdd", 1);
+		DBObject dcDistrict = (DBObject) database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection).first();
+		//double dYtd = dcDistrict.getDouble("dTax");
+		BasicDBObject dcDistrictUpdate = new BasicDBObject().append("$inc", new BasicDBObject("dYtd", payment));
+		database.getCollection("district").updateOne(dcDistrictQuery, dcDistrictUpdate);
+
+		// update customer
+		BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", wID).append("cDId", dID).append("cId", cID);
+		BasicDBObject dcCustomerProjection = new BasicDBObject().append("cName", 1).append("cAdd", 1).append("cPhone", 1).append("cSince", 1).append("cCredit", 1).append("cCreditLimit", 1).append("cDiscount", 1).append("cBalance", 1).append("cYtdPayment", 1).append("cPaymentCnt", 1);
+		DBObject dcCustomer = (DBObject) database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();		
+		double cBalance = (Double) dcCustomer.get("cBalance");
+		double cYtd = (Double) dcCustomer.get("cYtdPayment");
+		int cPaymentCnt = (Integer) dcCustomer.get("cPaymentCnt");
+		cBalance -= payment;
+		cYtd += payment;
+		cPaymentCnt += 1;
+		BasicDBObject dcCustomerUpdate = new BasicDBObject().append("cBalance", cBalance).append("cYtd", cYtd).append("cPaymentCnt", cPaymentCnt);
+		database.getCollection("customer").replaceOne(dcCustomerQuery, dcCustomerUpdate);
+
+		// output 
+		System.out.println("Customer Information:");
+		System.out.println(String.format("ID: (%d, %d, %d) | Name: (%s, %s, %s) | Address: (%s, %s, %s, %s, %s) | %s, %s, %s, %.2f, %.4f, %.2f", wID, dID, cID, dcCustomer.getString("cName.first"), dcCustomer.getString("cName.middle"), dcCustomer.getString("cName.last"), dcCustomer.getString("cAdd.street1"), dcCustomer.getString("cAdd.street2"), dcCustomer.getString("cAdd.city"), dcCustomer.getString("cAdd.state"), dcCustomer.getString("cAdd.zip"), dcCustomer.getString("cPhone"), dcCustomer.get("cSince").toString(), dcCustomer.getString("cCredit"), dcCustomer.getDouble("cCreditLimit"), dcCustomer.getDouble("cDiscount"), cBalance));
+		System.out.println(String.format("Warehouse Address: (%s, %s, %s, %s, %s)", dcWarehouse.getString("wAdd.street1"), dcWarehouse.getString("wAdd.street2"), dcWarehouse.getString("wAdd.city"), dcWarehouse.getString("wAdd.state"), dcWarehouse.getString("wAdd.zip")));
+		System.out.println(String.format("District Address: (%s, %s, %s, %s, %s)", dcDistrict.getString("dAdd.street1"), dcDistrict.getString("dAdd.street2"), dcDistrict.getString("dAdd.city"), dcDistrict.getString("dAdd.state"), dcDistrict.getString("dAdd.zip")));
+		System.out.println(String.format("Payment Amount: %.2f", payment));
+	}
+
+}
