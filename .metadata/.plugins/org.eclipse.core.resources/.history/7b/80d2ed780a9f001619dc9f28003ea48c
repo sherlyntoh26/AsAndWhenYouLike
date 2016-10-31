@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import com.mongodb.client.MongoDatabase;
 
 public class NewOrderTransaction {
@@ -26,13 +25,12 @@ public class NewOrderTransaction {
 		// get d_next_o_id from given wid, did
 		BasicDBObject dcDistrictQuery = new BasicDBObject().append("dWId", wID).append("dId", dID);
 		BasicDBObject dcDistrictProjection = new BasicDBObject().append("dNextOId", 1).append("dTax", 1);
-		DBObject dcDistrict = (DBObject) database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection).first();
-		int dNextOId = (Integer) dcDistrict.get("dNextOId");
-		double dTax = (Double) dcDistrict.get("dTax");
+		Document dcDistrict = database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection).first();
+		int dNextOId = dcDistrict.getInteger("dNextOId");
+		double dTax = dcDistrict.getDouble("dTax");
 		
 		// update d_next_o_id by 1
-		// $inc --> increase
-		BasicDBObject dcDistrictUpdate = new BasicDBObject("$inc", new BasicDBObject("dNextOId", 1));
+		BasicDBObject dcDistrictUpdate = new BasicDBObject("$set", new BasicDBObject("dNextOId", dNextOId+1));
 		//dcDistrictUpdate.put("dNextOId", dNextOId+1);
 		database.getCollection("district").updateOne(dcDistrictQuery, dcDistrictUpdate);
 		
@@ -42,17 +40,17 @@ public class NewOrderTransaction {
 		ArrayList<String> arrayListOutput = new ArrayList<String>();
 		ArrayList<Map<String, Object>> orderLineArr = new ArrayList<Map<String, Object>>();
 		
-		BasicDBObject dcInvProjection = new BasicDBObject().append("iQty", 1).append("iYtd", 1).append("iOrderCnt", 1).append("iRemoteCnt", 1).append("iPrice", 1).append("iName", 1);
+		Document dcInvProjection = new Document("iQty", 1).append("iYtd", 1).append("iOrderCnt", 1).append("iRemoteCnt", 1).append("iPrice", 1).append("iName", 1);
 		
 		for (int i=0; i<numOfItems; i++){
-			BasicDBObject dcInvQuery = new BasicDBObject().append("iWId", wID).append("iId", itemNumberArr[i]);
-			DBObject dcInv = (DBObject) database.getCollection("inventory").find(dcInvQuery).projection(dcInvProjection).first();
-			int invQty = (Integer) dcInv.get("iQty");
-			double invYtd = (Double) dcInv.get("iYtd");
-			int invOrderCnt = (Integer) dcInv.get("iOrderCnt");
-			int invRemoteCnt = (Integer) dcInv.get("iRemoteCnt");
-			double invPrice = (Double) dcInv.get("iPrice");
-			String invName = dcInv.get("iName").toString();
+			Document dcInvQuery = new Document("iWId", wID).append("iId", itemNumberArr[i]);
+			Document dcInv = database.getCollection("inventory").find(dcInvQuery).projection(dcInvProjection).first();
+			int invQty = dcInv.getInteger("iQty");
+			double invYtd = dcInv.getDouble("iYtd");
+			int invOrderCnt = dcInv.getInteger("iOrderCnt");
+			int invRemoteCnt = dcInv.getInteger("iRemoteCnt");
+			double invPrice = dcInv.getDouble("iPrice");
+			String invName = dcInv.getString("iName");
 			double itemAmt = (quantities[i] * invPrice);
 			totalAmt += itemAmt;
 			
@@ -66,7 +64,7 @@ public class NewOrderTransaction {
 			}
 			
 			// update Inventory
-			BasicDBObject dcInvUpdate = new BasicDBObject().append("$set", new BasicDBObject("iQty", adjustedQty)).append("iYtd", invYtd+quantities[i]).append("invOrderCnt", invOrderCnt+1).append("iRemoteCnt", invRemoteCnt);
+			Document dcInvUpdate = new Document("iQty", adjustedQty).append("iYtd", invYtd+quantities[i]).append("invOrderCnt", invOrderCnt+1).append("iRemoteCnt", invRemoteCnt);
 			database.getCollection("inventory").replaceOne(dcInvQuery, dcInvUpdate);
 			
 			// create document for 1 orderLine --> place it in array first

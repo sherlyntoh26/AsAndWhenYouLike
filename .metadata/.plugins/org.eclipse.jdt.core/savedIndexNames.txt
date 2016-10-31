@@ -34,7 +34,6 @@ INDEX VERSION 1.129+/Users/sherlyntoh/Desktop/MongoDB/master/.metadata/.plugins/
 1265885081.index
 3568608836.index
 4155219971.index
-937565029.index
 2979435446.index
 2076505374.index
 3157663476.index

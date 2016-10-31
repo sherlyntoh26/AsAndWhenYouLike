@@ -2,8 +2,6 @@ package mongodb;
 
 import org.bson.Document;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoDatabase;
 
 public class OrderStatusTransaction {
@@ -26,15 +24,11 @@ public class OrderStatusTransaction {
 		System.out.println(String.format("Customer's Name: (%s, %s, %s) | Balance: %.2f", dcCustomer.getString("cName.first"), dcCustomer.getString("cName.middle"), dcCustomer.getString("cName.last"), dcCustomer.getDouble("cBalance")));
 
 		// get last order
-		BasicDBObject dcOrderLast = new BasicDBObject("oId", -1);
+		Document dcOrderLast = new Document("oId", -1);
 		Document dcOrderQuery = new Document("oWId", wID).append("oDId", dID).append("oCId", cID);
 		Document dcOrderProjection = new Document("oId",1).append("oEntryDate", 1).append("oCarrierId", 1).append("oOrderLine", 1);
 		Document dcOrder = database.getCollection("order").find(dcOrderQuery).projection(dcOrderProjection).sort(dcOrderLast).limit(1).first();
-		int oId = dcOrder.getInteger("oId");
-		String entryDate = dcOrder.get("oEntryDate").toString();
-		int oCId = dcOrder.getInteger("oCarrierId");
-		BasicDBList orderLine = (BasicDBList) dcOrder.get("oOrderLine");
-		
+
 		String deliveryDate="";
 		try{
 			deliveryDate = dcOrder.getString("o_delivery_d");
@@ -42,10 +36,10 @@ public class OrderStatusTransaction {
 			deliveryDate = "Not delivered";
 		}
 
-		System.out.println(String.format("Last order number: %d | Entry date & time: %s | Carrier ID: %d", oId, orderRow.getTimestamp("o_entry_d").toString(), orderRow.getInt("o_carrier_id")));
+		System.out.println(String.format("Last order number: %d | Entry date & time: %s | Carrier ID: %d", orderId, orderRow.getTimestamp("o_entry_d").toString(), orderRow.getInt("o_carrier_id")));
 
 		System.out.println("Ordered Item(s)");
-		ResultSet orderLineResult = session.execute(selectOrderLineStmt.bind(wID, dID, orderId));
+		ResultSet orderLineResult = session.execute(selectOrderLineStmt.bind(cWID, cDID, orderId));
 		List<Row> orderLineRow = orderLineResult.all();
 		for(int i=0; i < orderLineRow.size(); i++){
 			Row currentRow = orderLineRow.get(i);

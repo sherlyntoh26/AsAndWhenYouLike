@@ -66,7 +66,7 @@ public class NewOrderTransaction {
 			}
 			
 			// update Inventory
-			BasicDBObject dcInvUpdate = new BasicDBObject().append("$set", new BasicDBObject("iQty", adjustedQty)).append("iYtd", invYtd+quantities[i]).append("invOrderCnt", invOrderCnt+1).append("iRemoteCnt", invRemoteCnt);
+			BasicDBObject dcInvUpdate = new BasicDBObject().append("iQty", adjustedQty).append("iYtd", invYtd+quantities[i]).append("invOrderCnt", invOrderCnt+1).append("iRemoteCnt", invRemoteCnt);
 			database.getCollection("inventory").replaceOne(dcInvQuery, dcInvUpdate);
 			
 			// create document for 1 orderLine --> place it in array first
