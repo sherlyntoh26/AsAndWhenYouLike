@@ -47,7 +47,7 @@ public class OrderStatusTransaction {
 		
 		for(int i=0; i < orderLineList.size(); i++){
 			BasicDBObject orderLine = (BasicDBObject) orderLineList.get(i);
-			System.out.println(String.format("Item No.: %d | Supplying Warehouse No.: %d | quantity: %.0f | Total price: %.2f | Delivery date & time: %s", orderLine.getInt("iId"), orderLine.getInt("supplyWId"), orderLine.getInt("qty"), orderLine.getDouble("amt"), deliveryDate));
+			System.out.println(String.format("Item No.: %d | Supplying Warehouse No.: %d | quantity: %.0f | Total price: %.2f | Delivery date & time: %s", currentRow.getInt("ol_i_id"), currentRow.getInt("ol_supply_w_id"), currentRow.getDecimal("ol_quantity"), currentRow.getDecimal("ol_amount"), deliveryDate));
 		}
 	}
 }

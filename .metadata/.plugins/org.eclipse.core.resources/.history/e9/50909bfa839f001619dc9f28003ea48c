@@ -31,8 +31,8 @@ public class OrderStatusTransaction {
 		DBObject dcOrder = (DBObject) database.getCollection("order").find(dcOrderQuery).projection(dcOrderProjection).sort(dcOrderLast).limit(1).first();
 		int oId = (Integer) dcOrder.get("oId");
 		String entryDate = dcOrder.get("oEntryDate").toString();
-		int oCarrierId = (Integer) dcOrder.get("oCarrierId");
-		BasicDBList orderLineList = (BasicDBList) dcOrder.get("oOrderLine");
+		int oCId = (Integer) dcOrder.get("oCarrierId");
+		BasicDBList orderLine = (BasicDBList) dcOrder.get("oOrderLine");
 		
 		String deliveryDate="";
 		try{
@@ -41,13 +41,14 @@ public class OrderStatusTransaction {
 			deliveryDate = "Not delivered";
 		}
 
-		System.out.println(String.format("Last order number: %d | Entry date & time: %s | Carrier ID: %d", oId, entryDate, oCarrierId));
+		System.out.println(String.format("Last order number: %d | Entry date & time: %s | Carrier ID: %d", oId, orderRow.getTimestamp("o_entry_d").toString(), orderRow.getInt("o_carrier_id")));
 
 		System.out.println("Ordered Item(s)");
-		
-		for(int i=0; i < orderLineList.size(); i++){
-			BasicDBObject orderLine = (BasicDBObject) orderLineList.get(i);
-			System.out.println(String.format("Item No.: %d | Supplying Warehouse No.: %d | quantity: %.0f | Total price: %.2f | Delivery date & time: %s", orderLine.getInt("iId"), orderLine.getInt("supplyWId"), orderLine.getInt("qty"), orderLine.getDouble("amt"), deliveryDate));
+		ResultSet orderLineResult = session.execute(selectOrderLineStmt.bind(wID, dID, orderId));
+		List<Row> orderLineRow = orderLineResult.all();
+		for(int i=0; i < orderLineRow.size(); i++){
+			Row currentRow = orderLineRow.get(i);
+			System.out.println(String.format("Item No.: %d | Supplying Warehouse No.: %d | quantity: %.0f | Total price: %.2f | Delivery date & time: %s", currentRow.getInt("ol_i_id"), currentRow.getInt("ol_supply_w_id"), currentRow.getDecimal("ol_quantity"), currentRow.getDecimal("ol_amount"), deliveryDate));
 		}
 	}
 }

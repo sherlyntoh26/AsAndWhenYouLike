@@ -32,7 +32,7 @@ public class OrderStatusTransaction {
 		int oId = (Integer) dcOrder.get("oId");
 		String entryDate = dcOrder.get("oEntryDate").toString();
 		int oCarrierId = (Integer) dcOrder.get("oCarrierId");
-		BasicDBList orderLineList = (BasicDBList) dcOrder.get("oOrderLine");
+		BasicDBList orderLine = (BasicDBList) dcOrder.get("oOrderLine");
 		
 		String deliveryDate="";
 		try{
@@ -45,9 +45,9 @@ public class OrderStatusTransaction {
 
 		System.out.println("Ordered Item(s)");
 		
-		for(int i=0; i < orderLineList.size(); i++){
-			BasicDBObject orderLine = (BasicDBObject) orderLineList.get(i);
-			System.out.println(String.format("Item No.: %d | Supplying Warehouse No.: %d | quantity: %.0f | Total price: %.2f | Delivery date & time: %s", orderLine.getInt("iId"), orderLine.getInt("supplyWId"), orderLine.getInt("qty"), orderLine.getDouble("amt"), deliveryDate));
+		for(int i=0; i < orderLine.size(); i++){
+			Row currentRow = orderLineRow.get(i);
+			System.out.println(String.format("Item No.: %d | Supplying Warehouse No.: %d | quantity: %.0f | Total price: %.2f | Delivery date & time: %s", currentRow.getInt("ol_i_id"), currentRow.getInt("ol_supply_w_id"), currentRow.getDecimal("ol_quantity"), currentRow.getDecimal("ol_amount"), deliveryDate));
 		}
 	}
 }
