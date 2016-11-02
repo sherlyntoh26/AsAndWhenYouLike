@@ -1,0 +1,95 @@
+package mongodb;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.bson.Document;
+
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoDatabase;
+
+public class PopularItemTransaction {
+
+	private MongoDatabase database;
+
+	public PopularItemTransaction(){
+		// public constructor
+	}
+
+	public PopularItemTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void getPopularItem(int wID, int dID, int noOfLastOrders) {
+		
+		System.out.println(String.format("District Identifier: (%d, %d)", wID, dID));
+		System.out.println(String.format("Number of last orders to be examined: %d", noOfLastOrders));
+		HashMap<String, Integer> allPopItem = new HashMap<String, Integer>();
+		
+		// can sort --> don't need to get D_NEXT_O_ID
+		/*BasicDBObject dcDistrictQuery = new BasicDBObject().append("dWId", wID).append("dId", dID);
+		BasicDBObject dcDistrictProjection = new BasicDBObject().append("dNextOId", 1);
+		DBObject dcDistrict = (DBObject) database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection);
+		int dNextOId = (Integer) dcDistrict.get("dNextOId");*/
+		
+		// grab last L orders
+		BasicDBObject dcOrderSort = new BasicDBObject().append("oId", -1);
+		BasicDBObject dcOrderQuery = new BasicDBObject().append("oWId", wID).append("oDId", dID);
+		BasicDBObject dcOrderProjection = new BasicDBObject().append("oId", 1).append("oEntryDate", 1).append("oCId", 1).append("oOrderLine", 1);
+		FindIterable<Document> dcOrdersCursor = database.getCollection("order").find(dcOrderQuery).projection(dcOrderProjection).sort(dcOrderSort).limit(noOfLastOrders);
+		for(Document doc : dcOrdersCursor){
+			// each item here
+			System.out.println(String.format("Order No.: %d | Entry date & time: %s", doc.getInteger("oId"),
+					doc.get("oEntryDate").toString()));
+			
+			// print customer
+			int cID = doc.getInteger("oCId");
+			BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", wID).append("cDId", dID).append("cId", cID);
+			BasicDBObject dcCustomerProjection = new BasicDBObject().append("cName",1);
+			DBObject dcCustomer = (DBObject) database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
+			System.out.println(String.format("Customer's Name: (%s, %s, %s)", dcCustomer.get("cName.first").toString(), dcCustomer.get("cName.middle").toString(), dcCustomer.get("cName.last").toString()));
+			
+			BasicDBList orderLineList = (BasicDBList) doc.get("oOrderLine");
+			int popQty = -1;
+			int currentQty = 0;
+			String itemName ="";
+			ArrayList<String> itemNames = new ArrayList<String>();
+			for(int i=0; i<orderLineList.size(); i++){
+				BasicDBObject orderLine = (BasicDBObject) orderLineList.get(i);
+				currentQty = orderLine.getInt("qty");
+				itemName = orderLine.getString("iName");
+				if(currentQty > popQty){
+					popQty = currentQty;
+					itemNames.clear();
+					itemNames.add(itemName);
+				}else if(currentQty == popQty){
+					itemNames.add(itemName);
+				}
+			}
+			System.out.println("Order's popular item(s)");
+			for (int j = 0; j < itemNames.size(); j++) {
+
+				if (allPopItem.containsKey(itemNames.get(j))) {
+					// exist --> update list
+					int value = allPopItem.get(itemNames.get(j));
+					allPopItem.replace(itemNames.get(j), value + 1);
+				} else {
+					// does not exist --> insert to list
+					allPopItem.put(itemNames.get(j), 1);
+				}
+
+				System.out.println(String.format("Item Name: %s | Quantity ordered: %d", itemNames.get(j), popQty));
+			}
+		}
+		System.out.println("All popular item(s)");
+		for (String itemName : allPopItem.keySet()) {
+			int value = allPopItem.get(itemName);
+			float percentage = ((float) value / noOfLastOrders) * 100f;
+			System.out.println(String.format("Item Name: %s | Percentage: %.2f%%", itemName, percentage));
+		}
+	}
+}

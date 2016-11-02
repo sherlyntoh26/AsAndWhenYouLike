@@ -1,0 +1,25 @@
+package mongodb;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoDatabase;
+
+public class PopularItemTransaction {
+
+	private MongoDatabase database;
+
+	public PopularItemTransaction(){
+		// public constructor
+	}
+
+	public PopularItemTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void getPopularItem(int wID, int dID, int noOfLastOrders) {
+		BasicDBObject dcDistrictQuery = new BasicDBObject().append("dWId", wID).append("dId", dID);
+		BasicDBObject dcDistrictProjection = new BasicDBObject().append("dNextOId", 1);
+		DBObject dcDistrict = (DBObject) database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection);
+		
+		
+	}
+}

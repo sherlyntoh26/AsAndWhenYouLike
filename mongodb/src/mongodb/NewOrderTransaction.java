@@ -94,7 +94,7 @@ public class NewOrderTransaction {
 		orderMap.put("oDId", dID);
 		orderMap.put("oId", dNextOId);
 		orderMap.put("oCId", cID);
-		orderMap.put("oCarrierId", 1);
+		orderMap.put("oCarrierId", 0);
 		orderMap.put("oOlCnt", numOfItems);
 		orderMap.put("oAllLocal", allLocal);
 		orderMap.put("oEntryDate", orderDate);

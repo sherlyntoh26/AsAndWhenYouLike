@@ -1,0 +1,15 @@
+package mongodb;
+
+import com.mongodb.client.MongoDatabase;
+
+public class StockLevelTransaction {
+	private MongoDatabase database;
+
+	public StockLevelTransaction(){
+		// public constructor
+	}
+
+	public StockLevelTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+}

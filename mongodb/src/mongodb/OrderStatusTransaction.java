@@ -25,10 +25,10 @@ public class OrderStatusTransaction {
 		System.out.println(String.format("Customer's Name: (%s, %s, %s) | Balance: %.2f", dcCustomer.get("cName.first").toString(), dcCustomer.get("cName.middle").toString(), dcCustomer.get("cName.last").toString(), (Double) dcCustomer.get("cBalance")));
 
 		// get last order
-		BasicDBObject dcOrderLast = new BasicDBObject().append("oId", -1);
+		BasicDBObject dcOrderSort = new BasicDBObject().append("oId", -1);
 		BasicDBObject dcOrderQuery = new BasicDBObject().append("oWId", wID).append("oDId", dID).append("oCId", cID);
 		BasicDBObject dcOrderProjection = new BasicDBObject().append("oId",1).append("oEntryDate", 1).append("oDeliveryDate", 1).append("oCarrierId", 1).append("oOrderLine", 1);
-		DBObject dcOrder = (DBObject) database.getCollection("order").find(dcOrderQuery).projection(dcOrderProjection).sort(dcOrderLast).limit(1).first();
+		DBObject dcOrder = (DBObject) database.getCollection("order").find(dcOrderQuery).projection(dcOrderProjection).sort(dcOrderSort).limit(1).first();
 		int oId = (Integer) dcOrder.get("oId");
 		String entryDate = dcOrder.get("oEntryDate").toString();
 		int oCarrierId = (Integer) dcOrder.get("oCarrierId");

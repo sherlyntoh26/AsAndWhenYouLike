@@ -1,0 +1,35 @@
+package mongodb;
+
+import com.mongodb.BasicDBList;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.client.MongoDatabase;
+
+public class PopularItemTransaction {
+
+	private MongoDatabase database;
+
+	public PopularItemTransaction(){
+		// public constructor
+	}
+
+	public PopularItemTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void getPopularItem(int wID, int dID, int noOfLastOrders) {
+		// can sort --> don't need to get D_NEXT_O_ID
+		/*BasicDBObject dcDistrictQuery = new BasicDBObject().append("dWId", wID).append("dId", dID);
+		BasicDBObject dcDistrictProjection = new BasicDBObject().append("dNextOId", 1);
+		DBObject dcDistrict = (DBObject) database.getCollection("district").find(dcDistrictQuery).projection(dcDistrictProjection);
+		int dNextOId = (Integer) dcDistrict.get("dNextOId");*/
+		
+		// grab last L orders
+		BasicDBObject dcOrderSort = new BasicDBObject().append("oId", -1);
+		BasicDBObject dcOrderQuery = new BasicDBObject().append("oWId", wID).append("oDId", dID);
+		BasicDBObject dcOrderProjection = new BasicDBObject().append("oId", 1).append("oCId", 1).append("oOrderLine", 1);
+		DBCursor dcOrders = (DBCursor) database.getCollection("order").find(dcOrderQuery).projection(dcOrderProjection).sort(dcOrderSort).limit(noOfLastOrders).;
+		
+	}
+}

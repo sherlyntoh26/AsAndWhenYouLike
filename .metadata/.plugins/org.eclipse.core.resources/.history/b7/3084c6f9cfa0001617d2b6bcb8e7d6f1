@@ -1,0 +1,16 @@
+package mongodb;
+
+import com.mongodb.client.MongoDatabase;
+
+public class PopularItemTransaction {
+
+	private MongoDatabase database;
+
+	public PopularItemTransaction(){
+		// public constructor
+	}
+
+	public PopularItemTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+}

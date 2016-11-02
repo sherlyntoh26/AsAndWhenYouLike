@@ -1,5 +1,0 @@
-package mongodb;
-
-public class NewOrderTransaction {
-
-}

@@ -1,0 +1,17 @@
+package mongodb;
+
+import com.mongodb.client.MongoDatabase;
+
+public class TopBalanceTransaction {
+	private MongoDatabase database;
+
+	public TopBalanceTransaction(){
+		// public constructor
+	}
+	
+	public TopBalanceTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	
+}

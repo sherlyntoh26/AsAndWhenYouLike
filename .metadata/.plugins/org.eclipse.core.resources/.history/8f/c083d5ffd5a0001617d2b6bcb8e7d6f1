@@ -1,0 +1,17 @@
+package mongodb;
+
+import com.mongodb.client.MongoDatabase;
+
+public class DeliveryTransaction {
+	private MongoDatabase database;
+
+	public DeliveryTransaction(){
+		// public constructor
+	}
+	
+	public DeliveryTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	
+}

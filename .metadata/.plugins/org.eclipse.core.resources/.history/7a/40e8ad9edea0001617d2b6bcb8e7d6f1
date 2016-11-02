@@ -1,0 +1,31 @@
+package mongodb;
+
+import org.bson.Document;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoDatabase;
+
+public class StockLevelTransaction {
+	private MongoDatabase database;
+
+	public StockLevelTransaction(){
+		// public constructor
+	}
+
+	public StockLevelTransaction(Connection connection){
+		database = connection.getDatabase();
+	}
+	
+	public void stockLevel(int wID,int dID,int T,int L) {
+		
+		// can sort --> don't need to get D_NEXT_O_ID
+		BasicDBObject dcOrderSort = new BasicDBObject().append("oId", -1);
+		BasicDBObject dcOrderQuery = new BasicDBObject().append("oWId", wID).append("oDId", dID);
+		BasicDBObject dcOrderProjection = new BasicDBObject().append("oId", 1).append("oEntryDate", 1).append("oCId", 1).append("oOrderLine", 1);
+		FindIterable<Document> dcOrdersCursor = database.getCollection("order").find(dcOrderQuery).projection(dcOrderProjection).sort(dcOrderSort).limit(noOfLastOrders);
+		for(Document doc : dcOrdersCursor){
+			
+		}
+	}
+}
