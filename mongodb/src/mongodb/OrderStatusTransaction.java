@@ -1,9 +1,16 @@
-package mongodb;
+
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoCollection;
+
+import java.util.List;
+
+import org.bson.Document;
+import org.bson.BsonArray;
 
 public class OrderStatusTransaction {
 	private MongoDatabase database;
@@ -16,14 +23,37 @@ public class OrderStatusTransaction {
 		database = connection.getDatabase();
 	}
 
+
 	public void getOrderStatus(int wID, int dID, int cID){
-
-		// print customer
-		BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", wID).append("cDId", dID).append("cId", cID);
+		System.out.println("wID"+wID+" ;dID"+dID+" ;cID"+cID);
+/*		//@SuppressWarnings("deprecation")	
+ * 		for(String s : database.listCollectionNames())
+			System.out.println("OrderStatus: "+s);*/
+		
+		BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", Integer.toString(wID)).append("cDId", Integer.toString(dID)).append("cId", Integer.toString(cID));
 		BasicDBObject dcCustomerProjection = new BasicDBObject().append("cName",1).append("cBalance", 1);
-		DBObject dcCustomer = (DBObject) database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
-		System.out.println(String.format("Customer's Name: (%s, %s, %s) | Balance: %.2f", dcCustomer.get("cName.first").toString(), dcCustomer.get("cName.middle").toString(), dcCustomer.get("cName.last").toString(), (Double) dcCustomer.get("cBalance")));
-
+		MongoCollection<Document> coll = database.getCollection("customer");
+		MongoCursor<Document> cursor = coll.find(dcCustomerQuery).iterator();
+		try {
+	        while (cursor.hasNext()) {
+	        	Document dcCustomer = cursor.next();
+	        	@SuppressWarnings("unchecked")
+	        	List<String> nameList = (List<String>) dcCustomer.get("cName");      	
+				System.out.println(String.format("Customer's Name: (%s, %s, %s) | Balance: %.2f", nameList.get(0), nameList.get(1), nameList.get(2), Double.parseDouble(dcCustomer.getString("cBalance"))));		
+	        }
+	    } finally {
+	        cursor.close();
+	    }
+		
+/*		// print customer
+		BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", Integer.toString(wID)).append("cDId", Integer.toString(dID)).append("cId", Integer.toString(cID));
+		//BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", wID).append("cDId", dID).append("cId", cID);
+		BasicDBObject dcCustomerProjection = new BasicDBObject().append("cName",1).append("cBalance", 1);
+		//DBObject dcCustomer = (DBObject) database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
+		Document dcCustomer = database.getCollection("customer").find(dcCustomerQuery).projection(dcCustomerProjection).first();
+		System.out.println(String.format("Customer's Name: (%s, %s, %s) | Balance: %.2f", dcCustomer.getString("cName.first"), dcCustomer.getString("cName.middle"), dcCustomer.getString("cName.last"), Double.parseDouble(dcCustomer.getString("cBalance"))));
+		//System.out.println(String.format("Customer's Name: (%s, %s, %s) | Balance: %.2f", dcCustomer.get("cName.first").toString(), dcCustomer.get("cName.middle").toString(), dcCustomer.get("cName.last").toString(), (Double) dcCustomer.get("cBalance")));
+*/
 		// get last order
 		BasicDBObject dcOrderSort = new BasicDBObject().append("oId", -1);
 		BasicDBObject dcOrderQuery = new BasicDBObject().append("oWId", wID).append("oDId", dID).append("oCId", cID);

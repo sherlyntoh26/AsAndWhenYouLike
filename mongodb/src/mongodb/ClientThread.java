@@ -1,4 +1,4 @@
-package mongodb;
+
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -47,6 +47,7 @@ public class ClientThread extends Thread{
 			String inputLine = reader.readLine();
 			while (inputLine != null && inputLine.length() > 0) {
 				String[] currentLine = inputLine.split(",");
+				//System.out.println("TEST : " +inputLine.charAt(0));
 				if (inputLine.charAt(0) == 'N') {
 					// new order transaction --> M+1 lines, M --> number of Items
 					// 1st line is 5 comma: N, C_ID, W_ID, D_ID, M

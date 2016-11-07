@@ -1,4 +1,4 @@
-package mongodb;
+
 
 public class MainFile {
 	private String dbName;
@@ -13,13 +13,13 @@ public class MainFile {
 		int transactionFileNumber;
 		if (args == null || args.length <= 0) {
 			dbNo = 8;
-			dbName = "d8";
+			dbName = "D8data";
 			noOfNodes = 1;
 			transactionFileNumber = 0;
 		} else {
-			boolean usingD8 = (args[0].trim()).equals("D8");
+			boolean usingD8 = (args[0].trim()).equals("D8data");
 			if(usingD8){
-				dbName = "d8";
+				dbName = "D8data";
 				dbNo = 8;
 			}else{
 				dbName = "d40";

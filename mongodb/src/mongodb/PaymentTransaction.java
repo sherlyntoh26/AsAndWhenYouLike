@@ -1,4 +1,3 @@
-package mongodb;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -15,8 +14,13 @@ public class PaymentTransaction {
 		database = connection.getDatabase();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void makePayment(int wID, int dID, int cID, double payment){
-
+		System.out.println("wID"+wID+" ;dID"+dID+" ;cID"+cID+" ;payment"+payment);
+		for(String s : database.listCollectionNames())
+			System.out.println("payment: "+s);
+		
+		
 		// update warehouse
 		BasicDBObject dcWarehouseQuery = new BasicDBObject().append("wId", wID);
 		//BasicDBObject dcWarehouseProjection = new BasicDBObject().append("wYtd", 1).append("wAdd", 1);
