@@ -33,8 +33,13 @@ public class OrderStatusTransaction {
 		BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", Integer.toString(wID)).append("cDId", Integer.toString(dID)).append("cId", Integer.toString(cID));
 		BasicDBObject dcCustomerProjection = new BasicDBObject().append("cName",1).append("cBalance", 1);
 		MongoCollection<Document> coll = database.getCollection("customer");
-		MongoCursor<Document> cursor = coll.find(dcCustomerQuery).projection(dcCustomerProjection).iterator();
-		try {
+		//MongoCursor<Document> cursor = coll.find(dcCustomerQuery).projection(dcCustomerProjection).iterator();
+		Document dcCustomer = coll.find(dcCustomerQuery).projection(dcCustomerProjection).first();
+		@SuppressWarnings("unchecked")
+    	List<String> nameList = (List<String>) dcCustomer.get("cName");      	
+		System.out.println(String.format("Customer's Name: (%s, %s, %s) | Balance: %.2f", nameList.get(0), nameList.get(1), nameList.get(2), Double.parseDouble(dcCustomer.getString("cBalance"))));		
+    
+		/*try {
 	        while (cursor.hasNext()) {
 	        	Document dcCustomer = cursor.next();
 	        	@SuppressWarnings("unchecked")
@@ -43,7 +48,7 @@ public class OrderStatusTransaction {
 	        }
 	    } finally {
 	        cursor.close();
-	    }
+	    }*/
 /*		// print customer
 		BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", Integer.toString(wID)).append("cDId", Integer.toString(dID)).append("cId", Integer.toString(cID));
 		//BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", wID).append("cDId", dID).append("cId", cID);
