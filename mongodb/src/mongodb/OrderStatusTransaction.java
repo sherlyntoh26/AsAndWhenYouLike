@@ -60,7 +60,7 @@ public class OrderStatusTransaction {
 */
 		// get last order
 		BasicDBObject dcOrderSort = new BasicDBObject().append("oId", -1);
-		BasicDBObject dcOrderQuery = new BasicDBObject().append("oWId", wID).append("oDId", dID).append("oCId", cID);
+		BasicDBObject dcOrderQuery = new BasicDBObject().append("oWId", Integer.toString(wID)).append("oDId", Integer.toString(dID)).append("oCId", Integer.toString(cID));
 		BasicDBObject dcOrderProjection = new BasicDBObject().append("oId",1).append("oEntryDate", 1).append("oDeliveryDate", 1).append("oCarrierId", 1).append("oOrderLine", 1);
 		MongoCollection<Document> coll2 = database.getCollection("order");
 		MongoCursor<Document> cursor2 = coll2.find(dcOrderQuery).projection(dcOrderProjection).sort(dcOrderSort).limit(1).iterator();
@@ -68,29 +68,24 @@ public class OrderStatusTransaction {
 	        while (cursor2.hasNext()) {
 	        	Document dcOrder = cursor2.next();
 	        	@SuppressWarnings("unchecked")
-	        	int oId = (Integer) dcOrder.get("oId");
-	        	System.out.println("OLD IS: "+oId);
-	        	String entryDate = dcOrder.get("oEntryDate").toString();
-	        	System.out.println("entryDate IS: "+entryDate);
-	    		int oCarrierId = (Integer) dcOrder.get("oCarrierId");
-	    		System.out.println("oCarrierId IS: "+oCarrierId);
+	        	int oId = Integer.parseInt((String) dcOrder.get("oId"));
+	        	String entryDate = (String) dcOrder.get("oEntryDate");
+	    		int oCarrierId = Integer.parseInt((String) dcOrder.get("oCarrierId"));
 	    		@SuppressWarnings("unchecked")
 	    		List<Document> orderLineList = (List<Document>) dcOrder.get("oOrderLine");
-	    		System.out.println("Length IS: "+orderLineList.size());
 	    		String deliveryDate="";
 	    		try{
-	    			deliveryDate = dcOrder.get("oDeliveryDate").toString();
+	    			deliveryDate = (String) dcOrder.get("oDeliveryDate");
 	    		}catch(NullPointerException e){
 	    			deliveryDate = "Not delivered";
 	    		}
-	    		System.out.println("deliveryDate IS: "+deliveryDate);
 	    		System.out.println(String.format("Last order number: %d | Entry date & time: %s | Carrier ID: %d", oId, entryDate, oCarrierId));
 
 	    		System.out.println("Ordered Item(s)");
 	    		
 	    		for(int i=0; i < orderLineList.size(); i++){
 	    			Document orderLine = orderLineList.get(i);
-	    			System.out.println(String.format("Item No.: %d | Supplying Warehouse No.: %d | quantity: %.0f | Total price: %.2f | Delivery date & time: %s", orderLine.get("iId"), orderLine.get("supplyWId"), orderLine.get("qty"), orderLine.getDouble("amt"), deliveryDate));
+	    			System.out.println(String.format("Item No.: %d | Supplying Warehouse No.: %d | quantity: %.0f | Total price: %.2f | Delivery date & time: %s", Integer.parseInt((String)orderLine.get("iId")), Integer.parseInt((String)orderLine.get("supplyWId")), Double.parseDouble((String)orderLine.get("qty")), Double.parseDouble((String) orderLine.get("amt")), (String) deliveryDate));
 	    		}
 	        }
 	    } finally {
