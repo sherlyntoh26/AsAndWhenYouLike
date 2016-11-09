@@ -22,7 +22,7 @@ public class MainFile {
 				dbName = "D8data";
 				dbNo = 8;
 			}else{
-				dbName = "d40";
+				dbName = "D40data";
 				dbNo = 40;
 			}
 			noOfNodes = Integer.parseInt(args[1]);

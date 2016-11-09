@@ -42,14 +42,18 @@ public class DeliveryTransaction {
 								.append("$set", new BasicDBObject("oCarrierId", Integer.toString(carrierID)))
 								.append("$set", new BasicDBObject("oDeliveryDate", new Timestamp(System.currentTimeMillis())));
 						coll.updateOne(dcOrderQueryUpdate, dcOrderUpdate);
-
 						// update customer
-						BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", wID).append("cDId", i).append("cId",
-								oCId);
+						BasicDBObject dcCustomerQuery = new BasicDBObject().append("cWId", Integer.toString(wID)).append("cDId", Integer.toString(i)).append("cId",
+								Integer.toString(oCId));
+						BasicDBObject dcCustomerProjection = new BasicDBObject().append("cBalance", 1).append("cDeliveryCnt", 1);
+						MongoCollection<Document> coll2 = database.getCollection("customer");
+						Document dcCustomer = coll2.find(dcCustomerQuery).projection(dcCustomerProjection).limit(1).first();
+						double cBal = Double.parseDouble((String)dcCustomer.get("cBalance"));
+						int cDel = Integer.parseInt((String)dcCustomer.get("cDeliveryCnt"));
 						BasicDBObject dcCustomerUpdate = new BasicDBObject()
-								.append("$inc", new BasicDBObject("cBalance", totalAmt))
-								.append("$inc", new BasicDBObject("cDeliveryCnt", 1));
-						database.getCollection("customer").updateOne(dcCustomerQuery, dcCustomerUpdate);
+								.append("$set", new BasicDBObject("cBalance", Double.toString((cBal+totalAmt))))
+								.append("$set", new BasicDBObject("cDeliveryCnt", Integer.toString((cDel+1))));
+						coll2.updateOne(dcCustomerQuery, dcCustomerUpdate);
 					}
 		        		
 		}
