@@ -25,7 +25,7 @@ public class OrderStatusTransaction {
 
 
 	public void getOrderStatus(int wID, int dID, int cID){
-		System.out.println("wID"+wID+" ;dID"+dID+" ;cID"+cID);
+		//System.out.println("wID"+wID+" ;dID"+dID+" ;cID"+cID);
 /*		//@SuppressWarnings("deprecation")	
  * 		for(String s : database.listCollectionNames())
 			System.out.println("OrderStatus: "+s);*/

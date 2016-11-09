@@ -29,7 +29,7 @@ public class NewOrderTransaction {
 		// get d_next_o_id from given wid, did
 				BasicDBObject dcDistrictQuery = new BasicDBObject().append("dWId", Integer.toString(wID)).append("dId", Integer.toString(dID));
 				BasicDBObject dcDistrictProjection = new BasicDBObject().append("dNextOId", 1).append("dTax", 1);
-				System.out.println("dWId:"+wID+" dId:"+dID);	
+				//System.out.println("dWId:"+wID+" dId:"+dID);	
 				MongoCollection<Document> coll = database.getCollection("district");
 				Document dcDistrict = coll.find(dcDistrictQuery).projection(dcDistrictProjection).first();
 				int dNextOId = Integer.parseInt((String) dcDistrict.get("dNextOId"));

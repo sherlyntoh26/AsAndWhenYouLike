@@ -22,7 +22,7 @@ public class DeliveryTransaction {
 
 	public void makeDelivery(int wID, int carrierID) {
 		int oldCarrierID = 0;
-		System.out.println("oWId:"+wID+" ;oCarrierId:"+carrierID);
+		//System.out.println("oWId:"+wID+" ;oCarrierId:"+carrierID);
 		for (int i = 1; i <= 10; i++) {
 			BasicDBObject dcOrderSort = new BasicDBObject().append("oId", 1);
 			BasicDBObject dcOrderQuery = new BasicDBObject().append("oWId", Integer.toString(wID)).append("oDId", Integer.toString(i)).append("oCarrierId",

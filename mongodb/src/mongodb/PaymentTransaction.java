@@ -19,7 +19,7 @@ public class PaymentTransaction {
 
 	// @SuppressWarnings("deprecation")
 	public void makePayment(int wID, int dID, int cID, double payment) {
-		System.out.println("wID:"+wID+" dID:"+dID+" cID:"+cID+ " payment:"+payment);
+		//System.out.println("wID:"+wID+" dID:"+dID+" cID:"+cID+ " payment:"+payment);
 		// update warehouse
 		BasicDBObject dcWarehouseQuery = new BasicDBObject().append("wId",Integer.toString(wID));
 		// BasicDBObject dcWarehouseProjection = new
