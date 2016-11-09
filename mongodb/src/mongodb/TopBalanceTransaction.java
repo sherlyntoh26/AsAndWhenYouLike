@@ -1,4 +1,6 @@
-package mongodb;
+
+
+import java.util.List;
 
 import org.bson.Document;
 
@@ -26,7 +28,9 @@ public class TopBalanceTransaction {
 		
 		for(Document doc : dcCustomer){
 			// for top 10 customer
-			System.out.println(String.format(printStmt, noOfCust, doc.getString("cName.first"), doc.getString("cName.middle"), doc.getString("cName.last"), doc.getDouble("cBalance"), doc.getString("cWName"), doc.getString("cDName")));
+			@SuppressWarnings("unchecked")
+	    	List<String> nameList = (List<String>) doc.get("cName");    
+			System.out.println(String.format(printStmt, noOfCust, nameList.get(0), nameList.get(1), nameList.get(2), Double.parseDouble((String)doc.get("cBalance")), (String) doc.get("cWName"), (String) doc.get("cDName")));
 			noOfCust++;
 		}
 	}
