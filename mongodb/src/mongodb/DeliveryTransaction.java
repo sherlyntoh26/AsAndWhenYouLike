@@ -39,7 +39,7 @@ public class DeliveryTransaction {
 						BasicDBObject dcOrderQueryUpdate = new BasicDBObject().append("oWId", wID).append("oDId", i)
 								.append("oId", oId);
 						BasicDBObject dcOrderUpdate = new BasicDBObject()
-								.append("$set", new BasicDBObject("oCarrierId", carrierID))
+								.append("$set", new BasicDBObject("oCarrierId", Integer.toString(carrierID)))
 								.append("$set", new BasicDBObject("oDeliveryDate", new Timestamp(System.currentTimeMillis())));
 						coll.updateOne(dcOrderQueryUpdate, dcOrderUpdate);
 

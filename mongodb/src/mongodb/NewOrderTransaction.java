@@ -53,8 +53,8 @@ public class NewOrderTransaction {
 					Document dcInv = coll2.find(dcInvQuery).projection(dcInvProjection).first();
 					int invQty = Integer.parseInt((String) dcInv.get("iQty"));
 					
-					//double invYtd = (Double) dcInv.get("iYtd");
-					//int invOrderCnt = (Integer) dcInv.get("iOrderCnt");
+					double invYtd = Double.parseDouble((String) dcInv.get("iYtd"));
+					int invOrderCnt = Integer.parseInt((String) dcInv.get("iOrderCnt"));
 					int invRemoteCnt;
 					try{
 						invRemoteCnt = (Integer) dcInv.get("iRemoteCnt");
@@ -75,9 +75,15 @@ public class NewOrderTransaction {
 						allLocal=0;
 						invRemoteCnt +=1;
 					}
-					
+					//String invRemoteCnts = Integer.toString(invRemoteCnt);
 					// update Inventory
-					BasicDBObject dcInvUpdate = new BasicDBObject().append("$set", new BasicDBObject("iQty", adjustedQty)).append("$inc", new BasicDBObject("iYtd", quantities[i])).append("$inc", new BasicDBObject("invOrderCnt", 1)).append("$set", new BasicDBObject("iRemoteCnt", invRemoteCnt));
+					//BasicDBObject dcInvUpdate = new BasicDBObject().append("$set", new BasicDBObject("iQty", Integer.parseInt(adjustedQty))).append("$set", new BasicDBObject("iYtd", Double.toString((Double)(invYtd+quantities[i])))).append("$set", new BasicDBObject("invOrderCnt", Integer.toString((invOrderCnt+1)))).append("$set", new BasicDBObject("iRemoteCnt", invRemoteCnts));
+					BasicDBObject dcInvUpdate = new BasicDBObject();
+					dcInvUpdate.put("$set", new BasicDBObject("iQty", Integer.toString(adjustedQty)));
+					dcInvUpdate.put("$set", new BasicDBObject("iYtd", Double.toString((Double)(invYtd+quantities[i]))));
+					dcInvUpdate.put("$set", new BasicDBObject("invOrderCnt", Integer.toString((invOrderCnt+1))));
+					dcInvUpdate.put("$set", new BasicDBObject("iRemoteCnt", Integer.toString(invRemoteCnt)));
+							
 					coll2.updateOne(dcInvQuery, dcInvUpdate);
 					// create document for 1 orderLine --> place it in array first
 					Map<String, Object> itemMap = new HashMap<String, Object>();
